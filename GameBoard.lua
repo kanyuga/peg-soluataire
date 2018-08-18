@@ -23,9 +23,9 @@ end
 --
 
 function GameBoard:initCells()
-    for row_index=1, row_count do
+    for row_index=1, self.row_count do
         self.cells[row_index] = {}
-        for column_index=1, column_count do
+        for column_index=1, self.column_count do
             self.cells[row_index][column_index] = Cell(row_index, column_index)
 
             if row_index > 1 then
@@ -92,6 +92,8 @@ function GameBoard:play(row_index, column_index)
         if cell.filled then
             if not self.selected_cell then
                 self:selectCell(cell)
+            else
+                self:deselectCell()
             end
         elseif self.selected_cell then
             -- Diagonal plays are disallowed by ensuring only the column or row changes and not both

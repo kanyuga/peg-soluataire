@@ -23,8 +23,6 @@ end
 
 board = GameBoard(ROWS, COLUMNS)
 
-board:print()
-
 board:startGame()
 
 board:print()
