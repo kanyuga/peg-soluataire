@@ -1,62 +1,40 @@
 ---
--- The entry point
---
+-- The entry point.
+-- The game states are as follows:
+--    Start game - Select rows & columns for the size of the board
+--    Play - Enter rows and columns to select cells until the game is won or lost
+--    End game - Display the outcome of the game
 
 Class = require "Class"
+
+require 'StateMachine'
+
+require 'states/BaseState'
+require 'states/StartState'
+require 'states/PlayState'
+require 'states/EndState'
+
 require "Cell"
 require "GameBoard"
-
-ROWS = 4
-COLUMNS = 4
+require "utils"
 
 math.randomseed(os.time())
 
-function math.avg(...)
-    local values = {...}
-    local sum = 0
-    for i=1, #values do
-        sum = sum + values[i]
-    end
-    return sum/#values
-end
-
+gStateMachine = StateMachine {
+    ['start'] = function() return StartState() end,
+    ['play'] = function() return PlayState() end,
+    ['end'] = function() return EndState() end
+}
+gStateMachine:change('start')
 
 -- game loop
 while true do
-    rows, columns = 0, 0
-
-    while (rows < 4 and columns < 4) do
-        print ("Enter number of columns (>=4)");
-        columns = io.read("*n", "*l");
-        print ("Enter number of rows (>=4)");
-        rows = io.read("*n", "*l");
+    gStateMachine:render()
+    local input = io.read()
+    if (input == 'x') then
+        os.exit()
     end
-
-    board = GameBoard(columns, rows)
-
-    board:startGame()
-
-    board:print()
-
-    while true do
-        print ("Enter a column")
-        local column = io.read("*n", "*l")
-
-        print ("Enter a row")
-        local row = io.read("*n", "*l")
-
-        board:play(row, column)
-        board:print()
-        if board:isGameWon() or board:isGameLost() then
-            break
-        end
-    end
-
-    if board:isGameWon() then
-        print ("You Won!")
-    else
-        print ("You Lost!")
-    end
+    gStateMachine:update(input)
 end
 
 
